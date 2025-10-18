@@ -22,7 +22,8 @@ This setup provides a complete tile server stack including:
 ### 1. Clone or navigate to this directory
 
 ```bash
-cd /home/dustin/sideprojects/osm-server
+git clone https://github.com/gridcell/osm-tile-server-docker-setup.git
+cd osm-tile-server-docker-setup
 ```
 
 ### 2. Download and import OSM data
