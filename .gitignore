@@ -1,0 +1,21 @@
+# Environment files
+.env
+
+# OSM data files
+osm-data/
+*.osm.pbf
+*.osm
+
+# Docker volumes
+postgres-data/
+tile-cache/
+
+# Downloaded shapefiles (will be in container)
+openstreetmap-carto/data/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

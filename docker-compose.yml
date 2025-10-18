@@ -1,0 +1,57 @@
+
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: osm-postgres
+    environment:
+      POSTGRES_DB: gis
+      POSTGRES_USER: renderaccount
+      POSTGRES_PASSWORD: renderpassword
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./scripts/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+    ports:
+      - "5432:5432"
+    networks:
+      - osm-network
+    shm_size: 256m
+    command: >
+      postgres
+      -c shared_buffers=2GB
+      -c work_mem=50MB
+      -c maintenance_work_mem=10GB
+      -c autovacuum_work_mem=2GB
+      -c effective_cache_size=24GB
+      -c random_page_cost=1.0
+
+  tile-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: osm-tile-server
+    depends_on:
+      - postgres
+    environment:
+      - DATABASE_URL=postgresql://renderaccount:renderpassword@postgres:5432/gis
+      - OSM_IMPORT_FILE=/data/map.osm.pbf
+      - OSM_IMPORT_CACHE=2048
+      - THREADS=4
+    volumes:
+      - tile-cache:/var/lib/mod_tile
+      - ./osm-data:/data
+      - carto-data:/home/renderer/src/openstreetmap-carto/data
+    ports:
+      - "80:80"
+    networks:
+      - osm-network
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  tile-cache:
+  carto-data:
+
+networks:
+  osm-network:
+    driver: bridge
